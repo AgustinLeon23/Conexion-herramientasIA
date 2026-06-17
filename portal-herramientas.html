@@ -1,0 +1,482 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Portal de Herramientas · [Tu Empresa]</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,700;12..96,800&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@500;600&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --porcelain:#F5F6F8;
+    --card:#FFFFFF;
+    --ink:#161A20;
+    --ink-soft:#5A626E;
+    --hairline:#E4E7EC;
+    --included:#157A52;       /* verde = incluida / sin costo */
+    --included-bg:#E8F3ED;
+    --licensed:#B07A1E;       /* dorado = con licencia / pago */
+    --licensed-bg:#FAF1DF;
+    --ms-blue:#2F6FE0;
+    --shadow:0 1px 2px rgba(22,26,32,.04), 0 8px 24px rgba(22,26,32,.06);
+    --radius:14px;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  html{scroll-behavior:smooth}
+  body{
+    font-family:'Inter',system-ui,sans-serif;
+    background:var(--porcelain);
+    color:var(--ink);
+    line-height:1.5;
+    -webkit-font-smoothing:antialiased;
+  }
+  .mono{font-family:'JetBrains Mono',ui-monospace,monospace}
+  .display{font-family:'Bricolage Grotesque','Inter',sans-serif;letter-spacing:-.02em;line-height:1.05}
+
+  /* ───────── LOGIN ───────── */
+  #login{
+    min-height:100vh;display:flex;align-items:center;justify-content:center;padding:24px;
+    background:
+      radial-gradient(120% 90% at 100% 0%, #EAF0FA 0%, transparent 55%),
+      radial-gradient(110% 90% at 0% 100%, #EAF4EE 0%, transparent 50%),
+      var(--porcelain);
+  }
+  .login-card{
+    background:var(--card);border-radius:22px;box-shadow:var(--shadow);
+    width:100%;max-width:440px;padding:40px 36px;border:1px solid var(--hairline);
+  }
+  .brand{display:flex;align-items:center;gap:11px;margin-bottom:32px}
+  .brand-mark{
+    width:38px;height:38px;border-radius:11px;display:grid;place-items:center;
+    background:var(--ink);color:#fff;font-family:'Bricolage Grotesque';font-weight:800;font-size:20px;
+  }
+  .brand-name{font-weight:600;font-size:15px}
+  .brand-name span{display:block;font-size:12px;color:var(--ink-soft);font-weight:400}
+  .login-card h1{font-size:27px;font-weight:700;margin-bottom:8px}
+  .login-card p.sub{color:var(--ink-soft);font-size:14.5px;margin-bottom:28px}
+  .ms-btn{
+    width:100%;display:flex;align-items:center;justify-content:center;gap:11px;
+    background:var(--card);border:1.5px solid #D4D9E0;border-radius:11px;
+    padding:13px;font-size:15px;font-weight:600;color:var(--ink);cursor:pointer;
+    transition:border-color .15s, background .15s, transform .05s;
+  }
+  .ms-btn:hover{border-color:var(--ms-blue);background:#FAFBFD}
+  .ms-btn:active{transform:translateY(1px)}
+  .ms-btn:focus-visible{outline:3px solid #C6D8F7;outline-offset:2px}
+  .ms-logo{width:18px;height:18px;display:grid;grid-template:1fr 1fr/1fr 1fr;gap:2px;flex:none}
+  .ms-logo i{display:block}
+  .ms-logo i:nth-child(1){background:#F25022}
+  .ms-logo i:nth-child(2){background:#7FBA00}
+  .ms-logo i:nth-child(3){background:#00A4EF}
+  .ms-logo i:nth-child(4){background:#FFB900}
+  .demo-note{
+    margin-top:24px;padding:13px 14px;background:#FBFBFC;border:1px dashed #D4D9E0;
+    border-radius:10px;font-size:12.5px;color:var(--ink-soft);
+  }
+  .demo-note b{color:var(--ink)}
+
+  /* ───────── APP ───────── */
+  #app{display:none;min-height:100vh}
+  header.topbar{
+    position:sticky;top:0;z-index:20;background:rgba(245,246,248,.85);
+    backdrop-filter:saturate(180%) blur(12px);border-bottom:1px solid var(--hairline);
+  }
+  .topbar-inner{max-width:1180px;margin:0 auto;padding:14px 24px;display:flex;align-items:center;gap:16px}
+  .topbar .brand{margin-bottom:0;flex:1;min-width:0}
+  .user-chip{
+    display:flex;align-items:center;gap:10px;background:var(--card);border:1px solid var(--hairline);
+    border-radius:999px;padding:5px 6px 5px 14px;flex:none;
+  }
+  .user-chip .meta{text-align:right;line-height:1.25}
+  .user-chip .meta b{font-size:13px;font-weight:600;display:block}
+  .user-chip .meta small{font-size:11.5px;color:var(--ink-soft)}
+  .avatar{width:32px;height:32px;border-radius:50%;background:var(--ink);color:#fff;
+    display:grid;place-items:center;font-weight:600;font-size:13px;flex:none}
+  .logout{background:none;border:none;color:var(--ink-soft);cursor:pointer;font-size:13px;
+    padding:8px;border-radius:8px;font-family:inherit}
+  .logout:hover{color:var(--ink);background:#EDEFF2}
+
+  main{max-width:1180px;margin:0 auto;padding:32px 24px 64px}
+  .page-head{margin-bottom:26px}
+  .eyebrow{font-family:'JetBrains Mono';font-size:11.5px;letter-spacing:.08em;text-transform:uppercase;
+    color:var(--ink-soft);margin-bottom:8px}
+  .page-head h1{font-size:32px;font-weight:800;margin-bottom:6px}
+  .page-head .area-pill{color:var(--ms-blue)}
+  .page-head p{color:var(--ink-soft);font-size:15px;max-width:60ch}
+
+  /* tablero de resumen */
+  .summary{display:flex;gap:14px;margin:22px 0 26px;flex-wrap:wrap}
+  .stat{
+    background:var(--card);border:1px solid var(--hairline);border-radius:var(--radius);
+    padding:16px 18px;flex:1;min-width:150px;display:flex;align-items:center;gap:14px;
+  }
+  .stat .dot{width:10px;height:10px;border-radius:3px;flex:none}
+  .stat.inc .dot{background:var(--included)}
+  .stat.lic .dot{background:var(--licensed)}
+  .stat.tot .dot{background:var(--ink)}
+  .stat .n{font-family:'Bricolage Grotesque';font-size:26px;font-weight:800;line-height:1}
+  .stat .l{font-size:12.5px;color:var(--ink-soft)}
+
+  /* controles */
+  .controls{display:flex;gap:12px;margin-bottom:24px;flex-wrap:wrap;align-items:center}
+  .search{flex:1;min-width:220px;position:relative}
+  .search input{
+    width:100%;padding:11px 14px 11px 38px;border:1px solid var(--hairline);border-radius:11px;
+    font-family:inherit;font-size:14.5px;background:var(--card);color:var(--ink);
+  }
+  .search input:focus{outline:none;border-color:var(--ms-blue);box-shadow:0 0 0 3px #E1EAFA}
+  .search svg{position:absolute;left:13px;top:50%;transform:translateY(-50%);color:var(--ink-soft)}
+  .filters{display:flex;gap:6px;background:var(--card);border:1px solid var(--hairline);
+    border-radius:11px;padding:4px}
+  .filters button{
+    border:none;background:none;font-family:inherit;font-size:13.5px;font-weight:500;color:var(--ink-soft);
+    padding:7px 13px;border-radius:8px;cursor:pointer;transition:.15s;white-space:nowrap;
+  }
+  .filters button.on{background:var(--ink);color:#fff}
+  .filters button:not(.on):hover{background:#EDEFF2;color:var(--ink)}
+
+  /* selector de área (solo demo) */
+  .demo-switch{
+    display:flex;align-items:center;gap:10px;background:#FFF8E8;border:1px dashed var(--licensed);
+    border-radius:11px;padding:8px 8px 8px 14px;
+  }
+  .demo-switch label{font-size:12.5px;color:var(--licensed);font-weight:600;white-space:nowrap}
+  .demo-switch select{
+    font-family:inherit;font-size:13.5px;padding:7px 10px;border-radius:8px;border:1px solid #E7D3A6;
+    background:var(--card);color:var(--ink);cursor:pointer;
+  }
+
+  /* grid de herramientas */
+  .grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:16px}
+  .tool{
+    background:var(--card);border:1px solid var(--hairline);border-radius:var(--radius);
+    padding:20px;position:relative;overflow:hidden;box-shadow:var(--shadow);
+    display:flex;flex-direction:column;gap:12px;transition:transform .12s, box-shadow .12s;
+  }
+  .tool::before{content:"";position:absolute;left:0;top:0;bottom:0;width:4px}
+  .tool.inc::before{background:var(--included)}
+  .tool.lic::before{background:var(--licensed)}
+  .tool:hover{transform:translateY(-2px);box-shadow:0 4px 8px rgba(22,26,32,.06),0 16px 32px rgba(22,26,32,.09)}
+  .tool-top{display:flex;align-items:flex-start;gap:13px}
+  .tool-icon{
+    width:44px;height:44px;border-radius:11px;flex:none;display:grid;place-items:center;
+    font-family:'Bricolage Grotesque';font-weight:800;font-size:18px;color:#fff;
+  }
+  .tool h3{font-size:16px;font-weight:600;line-height:1.25}
+  .tool .cat{font-family:'JetBrains Mono';font-size:11px;color:var(--ink-soft);text-transform:uppercase;
+    letter-spacing:.04em;margin-top:3px}
+  .tool p.desc{font-size:13.5px;color:var(--ink-soft);flex:1}
+  .tool-foot{display:flex;align-items:center;justify-content:space-between;gap:8px;
+    padding-top:13px;border-top:1px solid var(--hairline)}
+  .badge{display:inline-flex;align-items:center;gap:6px;font-size:12px;font-weight:600;
+    padding:5px 10px;border-radius:999px}
+  .badge.inc{background:var(--included-bg);color:var(--included)}
+  .badge.lic{background:var(--licensed-bg);color:var(--licensed)}
+  .badge svg{width:13px;height:13px}
+  .lic-detail{font-family:'JetBrains Mono';font-size:11px;color:var(--ink-soft)}
+  .open-link{font-size:13px;font-weight:600;color:var(--ms-blue);text-decoration:none}
+  .open-link:hover{text-decoration:underline}
+
+  .empty{text-align:center;padding:60px 20px;color:var(--ink-soft)}
+  .empty h3{font-size:18px;color:var(--ink);margin-bottom:6px;font-weight:600}
+
+  footer{max-width:1180px;margin:0 auto;padding:24px;color:var(--ink-soft);font-size:12.5px;
+    border-top:1px solid var(--hairline)}
+
+  @media (max-width:640px){
+    .topbar .brand-name{display:none}
+    .user-chip .meta{display:none}
+    .page-head h1{font-size:26px}
+    .controls{flex-direction:column;align-items:stretch}
+    .filters{overflow-x:auto}
+  }
+  @media (prefers-reduced-motion:reduce){*{transition:none!important}}
+</style>
+</head>
+<body>
+
+<!-- ═══════════════════════ PANTALLA DE LOGIN ═══════════════════════ -->
+<section id="login">
+  <div class="login-card">
+    <div class="brand">
+      <div class="brand-mark">H</div>
+      <div class="brand-name">Portal de Herramientas<span>[Tu Empresa]</span></div>
+    </div>
+    <h1 class="display">Tus herramientas, en un solo lugar.</h1>
+    <p class="sub">Iniciá sesión con tu cuenta corporativa para ver el software disponible para tu área.</p>
+
+    <button class="ms-btn" id="msLoginBtn">
+      <span class="ms-logo"><i></i><i></i><i></i><i></i></span>
+      Iniciar sesión con Microsoft
+    </button>
+
+    <div class="demo-note">
+      <b>Modo maqueta activo.</b> El botón simula el ingreso sin pedir credenciales reales.
+      Para conectar con Azure AD / Entra ID, ver el bloque <span class="mono">CONECTOR AZURE AD</span> en el código.
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════════════════ APP (post-login) ═══════════════════════ -->
+<div id="app">
+  <header class="topbar">
+    <div class="topbar-inner">
+      <div class="brand">
+        <div class="brand-mark">H</div>
+        <div class="brand-name">Portal de Herramientas<span>[Tu Empresa]</span></div>
+      </div>
+      <div class="user-chip">
+        <div class="meta">
+          <b id="userName">—</b>
+          <small id="userMail">—</small>
+        </div>
+        <div class="avatar" id="userInitials">—</div>
+      </div>
+      <button class="logout" id="logoutBtn">Salir</button>
+    </div>
+  </header>
+
+  <main>
+    <div class="page-head">
+      <div class="eyebrow">Catálogo por área</div>
+      <h1 class="display">Herramientas de <span class="area-pill" id="areaName">—</span></h1>
+      <p>Esto es lo que tenés habilitado según tu área. El color del borde indica si la herramienta está
+         <b style="color:var(--included)">incluida</b> o <b style="color:var(--licensed)">requiere licencia</b>.</p>
+    </div>
+
+    <!-- Selector visible SOLO para la maqueta. En producción el área la define Azure AD. -->
+    <div class="controls" style="margin-bottom:18px">
+      <div class="demo-switch">
+        <label for="areaSelect">🛠 Vista de maqueta · Ver como área:</label>
+        <select id="areaSelect"></select>
+      </div>
+    </div>
+
+    <div class="summary" id="summary"></div>
+
+    <div class="controls">
+      <div class="search">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="7"/><path d="m20 20-3-3"/></svg>
+        <input id="searchInput" type="text" placeholder="Buscar herramienta…">
+      </div>
+      <div class="filters" id="filters">
+        <button data-f="all" class="on">Todas</button>
+        <button data-f="inc">Incluidas</button>
+        <button data-f="lic">Con licencia</button>
+      </div>
+    </div>
+
+    <div class="grid" id="grid"></div>
+  </main>
+
+  <footer>
+    Portal de Herramientas · Maqueta para revisión del equipo de desarrollo. Los datos de áreas y herramientas son de ejemplo.
+  </footer>
+</div>
+
+<script>
+/* ════════════════════════════════════════════════════════════════════════
+   🔌 CONECTOR AZURE AD / ENTRA ID  —  CONFIGURAR ACÁ
+   ════════════════════════════════════════════════════════════════════════
+   Esta maqueta corre en DEMO_MODE = true: simula el login y deja elegir el
+   área a mano para mostrarle el resultado a desarrollo.
+
+   PARA CONECTAR DE VERDAD (pasos para tu equipo):
+
+   1) Registrar la app en Azure Portal:
+      Entra ID  ▸  App registrations  ▸  New registration
+      - Redirect URI (SPA): la URL donde se publique este portal
+      - Copiar el "Application (client) ID" y el "Directory (tenant) ID"
+
+   2) Permisos de API (Microsoft Graph, tipo Delegated):
+      - User.Read         → datos del usuario logueado
+      - GroupMember.Read.All  (o Directory.Read.All) → grupos del usuario
+      Otorgar consentimiento de admin.
+
+   3) Agregar la librería MSAL en el <head>:
+      <script src="https://alcdn.msauth.net/browser/2.38.0/js/msal-browser.min.js"><\/script>
+
+   4) Poner DEMO_MODE = false y completar msalConfig de abajo.
+
+   5) El área del usuario se deriva de sus grupos de Azure AD / AD.
+      Mapear el ID (o nombre) de cada grupo a un área en GROUP_TO_AREA.
+   ════════════════════════════════════════════════════════════════════════ */
+
+const DEMO_MODE = true;   // ← poner en false cuando se conecte a Azure AD
+
+const msalConfig = {
+  auth: {
+    clientId:    "TU_CLIENT_ID",                                   // ← Application (client) ID
+    authority:   "https://login.microsoftonline.com/TU_TENANT_ID", // ← Directory (tenant) ID
+    redirectUri: window.location.origin
+  },
+  cache: { cacheLocation: "sessionStorage" }
+};
+
+const loginRequest = { scopes: ["User.Read", "GroupMember.Read.All"] };
+
+/* Mapeo grupo de Azure AD/AD  →  área del portal.
+   Reemplazar las claves por los IDs (object id) o nombres de tus grupos reales. */
+const GROUP_TO_AREA = {
+  "GRP-ServiceDesk": "servicedesk",
+  "GRP-Desarrollo":  "desarrollo",
+  "GRP-RRHH":        "rrhh",
+  "GRP-Comercial":   "comercial",
+  "GRP-Admin":       "administracion",
+  "GRP-Marketing":   "marketing"
+};
+
+/* ── Login real con Azure (se usa cuando DEMO_MODE = false) ──
+   async function azureLogin(){
+     const msal = new msal.PublicClientApplication(msalConfig);
+     const { account } = await msal.loginPopup(loginRequest);
+     // datos del usuario:
+     //   account.name, account.username (email)
+     // grupos del usuario vía Microsoft Graph:
+     //   GET https://graph.microsoft.com/v1.0/me/memberOf
+     //   con el access token de msal.acquireTokenSilent(loginRequest)
+     // luego: buscar en GROUP_TO_AREA el primer grupo que matchee → área
+     // y llamar a renderApp(usuario, area)
+   }
+*/
+
+/* ════════════════════ DATOS DE EJEMPLO (reemplazar por los reales) ════════════════════
+   Cada herramienta:  name, cat(egoría), desc, cost: 'inc'|'lic', license(opcional), url(opcional)
+   En producción esto puede venir de una base/SharePoint list/API en vez de estar hardcodeado. */
+const AREAS = {
+  servicedesk: { label:"Service Desk", color:"#2F6FE0", tools:[
+    {name:"Microsoft Teams", cat:"Comunicación", desc:"Chat, llamadas y reuniones del equipo.", cost:"inc", url:"#"},
+    {name:"SharePoint", cat:"Documentación", desc:"Repositorio de instructivos y procesos.", cost:"inc", url:"#"},
+    {name:"InvGate Service Desk", cat:"Ticketing", desc:"Gestión de tickets y SLAs del help desk.", cost:"lic", license:"Licencia por agente", url:"#"},
+    {name:"AnyDesk", cat:"Acceso remoto", desc:"Soporte remoto a equipos de usuarios.", cost:"lic", license:"Plan Standard", url:"#"},
+    {name:"Active Directory Users", cat:"Administración", desc:"Gestión de cuentas y grupos.", cost:"inc", url:"#"},
+    {name:"PowerShell", cat:"Automatización", desc:"Scripts de administración y automatización.", cost:"inc", url:"#"},
+  ]},
+  desarrollo: { label:"Desarrollo", color:"#7B61FF", tools:[
+    {name:"Visual Studio Code", cat:"IDE", desc:"Editor de código liviano y extensible.", cost:"inc", url:"#"},
+    {name:"GitHub", cat:"Repositorios", desc:"Control de versiones y colaboración.", cost:"lic", license:"Team", url:"#"},
+    {name:"GitHub Copilot", cat:"Asistente IA", desc:"Sugerencias de código con IA.", cost:"lic", license:"Business", url:"#"},
+    {name:"Azure DevOps", cat:"CI/CD", desc:"Pipelines, boards y repos.", cost:"lic", license:"Basic", url:"#"},
+    {name:"Postman", cat:"APIs", desc:"Prueba y documentación de APIs.", cost:"inc", url:"#"},
+    {name:"Docker Desktop", cat:"Contenedores", desc:"Entornos containerizados locales.", cost:"inc", url:"#"},
+  ]},
+  rrhh: { label:"Recursos Humanos", color:"#157A52", tools:[
+    {name:"Microsoft 365", cat:"Ofimática", desc:"Word, Excel, Outlook y más.", cost:"lic", license:"E3", url:"#"},
+    {name:"SharePoint", cat:"Documentación", desc:"Legajos y políticas internas.", cost:"inc", url:"#"},
+    {name:"Microsoft Forms", cat:"Encuestas", desc:"Formularios y relevamientos.", cost:"inc", url:"#"},
+    {name:"Power BI", cat:"Reportes", desc:"Tableros de indicadores de RRHH.", cost:"lic", license:"Pro", url:"#"},
+  ]},
+  comercial: { label:"Comercial / Ventas", color:"#E0762F", tools:[
+    {name:"Dynamics 365 Sales", cat:"CRM", desc:"Gestión de oportunidades y clientes.", cost:"lic", license:"Enterprise", url:"#"},
+    {name:"Microsoft Outlook", cat:"Email", desc:"Correo y agenda comercial.", cost:"inc", url:"#"},
+    {name:"Power BI", cat:"Reportes", desc:"Tableros de ventas y pipeline.", cost:"lic", license:"Pro", url:"#"},
+    {name:"LinkedIn Sales Navigator", cat:"Prospección", desc:"Búsqueda de leads B2B.", cost:"lic", license:"Core", url:"#"},
+  ]},
+  administracion: { label:"Administración", color:"#B07A1E", tools:[
+    {name:"Microsoft Excel", cat:"Planillas", desc:"Modelos financieros y conciliaciones.", cost:"lic", license:"E3", url:"#"},
+    {name:"SharePoint", cat:"Documentación", desc:"Comprobantes y documentación.", cost:"inc", url:"#"},
+    {name:"Power Automate", cat:"Automatización", desc:"Flujos de aprobación y tareas.", cost:"lic", license:"Premium", url:"#"},
+  ]},
+  marketing: { label:"Marketing", color:"#D6336C", tools:[
+    {name:"Canva", cat:"Diseño", desc:"Piezas gráficas y plantillas.", cost:"inc", url:"#"},
+    {name:"Figma", cat:"Diseño", desc:"Diseño colaborativo de interfaces.", cost:"lic", license:"Professional", url:"#"},
+    {name:"Meta Business Suite", cat:"Redes", desc:"Gestión de redes sociales.", cost:"inc", url:"#"},
+    {name:"Power BI", cat:"Reportes", desc:"Métricas de campañas.", cost:"lic", license:"Pro", url:"#"},
+  ]},
+};
+
+/* ════════════════════ LÓGICA DE LA MAQUETA ════════════════════ */
+const $ = s => document.querySelector(s);
+let state = { area:"servicedesk", filter:"all", search:"", user:{name:"Agustín León", mail:"agustin.leon@tuempresa.com"} };
+
+function initials(n){ return n.split(" ").map(w=>w[0]).slice(0,2).join("").toUpperCase(); }
+function iconColor(name){ // color estable por herramienta
+  let h=0; for(const c of name) h=(h*31+c.charCodeAt(0))%360;
+  return `hsl(${h} 55% 45%)`;
+}
+
+function login(){
+  /* En producción: si DEMO_MODE === false, acá se llama a azureLogin()
+     y el área sale de los grupos del usuario (GROUP_TO_AREA). */
+  $("#login").style.display="none";
+  $("#app").style.display="block";
+  const u = state.user;
+  $("#userName").textContent = u.name;
+  $("#userMail").textContent = u.mail;
+  $("#userInitials").textContent = initials(u.name);
+  buildAreaSelect();
+  render();
+  window.scrollTo(0,0);
+}
+function logout(){
+  $("#app").style.display="none";
+  $("#login").style.display="flex";
+}
+
+function buildAreaSelect(){
+  const sel = $("#areaSelect");
+  sel.innerHTML = Object.entries(AREAS)
+    .map(([k,v])=>`<option value="${k}">${v.label}</option>`).join("");
+  sel.value = state.area;
+}
+
+function render(){
+  const area = AREAS[state.area];
+  $("#areaName").textContent = area.label;
+  $("#areaName").style.color = area.color;
+
+  const inc = area.tools.filter(t=>t.cost==="inc").length;
+  const lic = area.tools.filter(t=>t.cost==="lic").length;
+  $("#summary").innerHTML = `
+    <div class="stat tot"><span class="dot"></span><div><div class="n">${area.tools.length}</div><div class="l">Herramientas en total</div></div></div>
+    <div class="stat inc"><span class="dot"></span><div><div class="n">${inc}</div><div class="l">Incluidas (sin costo)</div></div></div>
+    <div class="stat lic"><span class="dot"></span><div><div class="n">${lic}</div><div class="l">Con licencia paga</div></div></div>`;
+
+  let tools = area.tools;
+  if(state.filter!=="all") tools = tools.filter(t=>t.cost===state.filter);
+  if(state.search){
+    const q = state.search.toLowerCase();
+    tools = tools.filter(t=> (t.name+t.cat+t.desc).toLowerCase().includes(q));
+  }
+
+  const grid = $("#grid");
+  if(!tools.length){
+    grid.innerHTML = `<div class="empty" style="grid-column:1/-1"><h3>Sin resultados</h3><p>Probá con otro término o cambiá el filtro.</p></div>`;
+    return;
+  }
+
+  grid.innerHTML = tools.map(t=>{
+    const isInc = t.cost==="inc";
+    const badge = isInc
+      ? `<span class="badge inc"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><path d="M5 13l4 4L19 7"/></svg> Incluida</span>`
+      : `<span class="badge lic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><rect x="5" y="11" width="14" height="9" rx="2"/><path d="M8 11V8a4 4 0 0 1 8 0v3"/></svg> Con licencia</span>`;
+    const foot = isInc
+      ? `${badge}${t.url?`<a class="open-link" href="${t.url}">Abrir →</a>`:""}`
+      : `${badge}<span class="lic-detail">${t.license||"Requiere licencia"}</span>`;
+    return `
+    <article class="tool ${t.cost}">
+      <div class="tool-top">
+        <div class="tool-icon" style="background:${iconColor(t.name)}">${t.name[0]}</div>
+        <div><h3>${t.name}</h3><div class="cat">${t.cat}</div></div>
+      </div>
+      <p class="desc">${t.desc}</p>
+      <div class="tool-foot">${foot}</div>
+    </article>`;
+  }).join("");
+}
+
+/* eventos */
+$("#msLoginBtn").addEventListener("click", login);
+$("#logoutBtn").addEventListener("click", logout);
+$("#areaSelect").addEventListener("change", e=>{ state.area=e.target.value; render(); });
+$("#searchInput").addEventListener("input", e=>{ state.search=e.target.value; render(); });
+$("#filters").addEventListener("click", e=>{
+  const b = e.target.closest("button"); if(!b) return;
+  state.filter = b.dataset.f;
+  [...$("#filters").children].forEach(x=>x.classList.toggle("on", x===b));
+  render();
+});
+</script>
+</body>
+</html>
